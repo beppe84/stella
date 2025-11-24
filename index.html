@@ -45,13 +45,25 @@
         
     </div>
 
+    <div id="heart-rain-container">
+        <div id="final-screen" class="final-heart-container">
+            <span class="final-text-message">
+                Welcome<br>into my mess<br>Stella!
+            </span>
+        </div>
+    </div>
+
     <script>
     let countdownInterval;
-    const TARGET_DATE_STRING = "2025-11-28 09:30:00"; 
+    const TARGET_DATE_STRING = "2025-11-24 15:40:00"; // La tua data target
     const countDownDateMs = new Date(TARGET_DATE_STRING).getTime(); 
     
     const heart1 = document.getElementById("heart-1");
     const heart2 = document.getElementById("heart-2");
+    
+    const fullScreenContent = document.querySelector(".full-screen-content"); 
+    const finalScreen = document.getElementById("final-screen"); 
+    const heartRainContainer = document.getElementById("heart-rain-container");
 
     /**
      * Riavvia l'animazione forzando il ricalcolo CSS, sincronizzando il battito.
@@ -59,28 +71,68 @@
     function restartHeartAnimation() {
         const hearts = [heart1, heart2];
         hearts.forEach(heart => {
-            // 1. Rimuove la classe di animazione (resettando l'animazione)
             heart.classList.remove("heart-animated");
-            
-            // 2. Forza il ricalcolo del DOM (criticale per il riavvio)
             void heart.offsetWidth; 
-            
-            // 3. Riaplica la classe (l'animazione riparte da 0)
             heart.classList.add("heart-animated");
         });
     }
+
+    // --- FUNZIONI PER LA PIOGGIA DI CUORI ---
+    const colors = ['#87CEEB', '#FF69B4']; // Azzurro (SkyBlue) e Rosa (HotPink)
+    const numHearts = 50; 
+
+    function createHeart() {
+        const heart = document.createElement('div');
+        heart.classList.add('rain-heart');
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        heart.style.backgroundColor = color;
+        
+        const size = Math.random() * (60 - 30) + 30; // da 30px a 60px
+        heart.style.width = `${size}px`;
+        heart.style.height = `${size}px`;
+        
+        heart.style.transform = `rotate(${Math.random() * 360}deg)`;
+
+        heart.style.left = `${Math.random() * 100}vw`;
+        heart.style.top = `${-size}px`; 
+        
+        const duration = Math.random() * (10 - 5) + 5; // da 5s a 10s
+        heart.style.animationDuration = `${duration}s`;
+        heart.style.animationDelay = `${Math.random() * duration}s`; 
+        
+        heartRainContainer.appendChild(heart);
+    }
+
+    function startHeartRain() {
+        // Nasconde il countdown
+        fullScreenContent.style.display = 'none';
+        
+        // Mostra il contenitore della pioggia di cuori
+        heartRainContainer.style.display = 'block'; 
+        
+        // Assicurati che il contenitore del TESTO FINALE sia visibile
+        finalScreen.style.display = 'flex'; 
+
+        for (let i = 0; i < numHearts; i++) {
+            createHeart();
+        }
+    }
+    // --- FINE FUNZIONI PER LA PIOGGIA DI CUORI ---
+
 
     function startCountdown() {
         if (countdownInterval) {
             clearInterval(countdownInterval);
         }
         
+        fullScreenContent.style.display = 'flex';
+        finalScreen.style.display = 'none'; // Il testo finale è nascosto
+        heartRainContainer.style.display = 'none'; 
+        
         document.getElementById("status-message").innerHTML = "";
 
-        // Esegui la prima sincronizzazione immediatamente
         restartHeartAnimation(); 
 
-        // Start the interval for time display
         countdownInterval = setInterval(function() {
 
             const now = new Date().getTime();
@@ -89,10 +141,9 @@
             if (distance < 0) {
                 clearInterval(countdownInterval);
                 
-                document.getElementById("hours-number").innerHTML = "00"; 
-                document.getElementById("minutes-number").innerHTML = "00";
-                document.getElementById("seconds-number").innerHTML = "00";
-                document.getElementById("status-message").innerHTML = "The target date and time have been reached."; 
+                // GESTIONE FINE COUNTDOWN: Avvia la pioggia di cuori
+                startHeartRain(); 
+                
                 return;
             }
 
@@ -110,10 +161,9 @@
             document.getElementById("minutes-number").innerHTML = minutesDisplay;
             document.getElementById("seconds-number").innerHTML = secondsDisplay;
             
-            // SINCRONIZZAZIONE: Riavvia l'animazione ad ogni cambio di secondo
             restartHeartAnimation();
 
-        }, 1000); // Check every second
+        }, 1000); 
     }
 
     window.onload = startCountdown; 
