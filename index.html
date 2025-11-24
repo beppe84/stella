@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Meeting in Malmö between</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <div class="full-screen-content"> 
+        <h1>Meeting in Malmö between</h1>
+        
+        <p id="status-message"></p>
+        
+        <div class="digital-countdown">
+            
+            <div class="time-group">
+                <span id="hours-number" class="number">00</span>
+                <span class="label">Hours</span>
+            </div>
+            
+            <div id="heart-1" class="heart-separator">
+                <svg viewBox="0 0 100 100" class="heart-svg">
+                    <path d="M50,90 C-10,40 10,0 50,20 C90,0 110,40 50,90 Z" fill="#61dafb"/>
+                </svg>
+            </div>
+            
+            <div class="time-group">
+                <span id="minutes-number" class="number">00</span>
+                <span class="label">Minutes</span>
+            </div>
+            
+            <div id="heart-2" class="heart-separator">
+                <svg viewBox="0 0 100 100" class="heart-svg">
+                    <path d="M50,90 C-10,40 10,0 50,20 C90,0 110,40 50,90 Z" fill="#ff69b4"/>
+                </svg>
+            </div>
+            
+            <div class="time-group">
+                <span id="seconds-number" class="number">00</span>
+                <span class="label">Seconds</span>
+            </div>
+            
+        </div>
+        
+    </div>
+
+    <script>
+    let countdownInterval;
+    const TARGET_DATE_STRING = "2025-11-28 09:30:00"; 
+    const countDownDateMs = new Date(TARGET_DATE_STRING).getTime(); 
+    
+    const heart1 = document.getElementById("heart-1");
+    const heart2 = document.getElementById("heart-2");
+
+    /**
+     * Riavvia l'animazione forzando il ricalcolo CSS, sincronizzando il battito.
+     */
+    function restartHeartAnimation() {
+        const hearts = [heart1, heart2];
+        hearts.forEach(heart => {
+            // 1. Rimuove la classe di animazione (resettando l'animazione)
+            heart.classList.remove("heart-animated");
+            
+            // 2. Forza il ricalcolo del DOM (criticale per il riavvio)
+            void heart.offsetWidth; 
+            
+            // 3. Riaplica la classe (l'animazione riparte da 0)
+            heart.classList.add("heart-animated");
+        });
+    }
+
+    function startCountdown() {
+        if (countdownInterval) {
+            clearInterval(countdownInterval);
+        }
+        
+        document.getElementById("status-message").innerHTML = "";
+
+        // Esegui la prima sincronizzazione immediatamente
+        restartHeartAnimation(); 
+
+        // Start the interval for time display
+        countdownInterval = setInterval(function() {
+
+            const now = new Date().getTime();
+            let distance = countDownDateMs - now;
+
+            if (distance < 0) {
+                clearInterval(countdownInterval);
+                
+                document.getElementById("hours-number").innerHTML = "00"; 
+                document.getElementById("minutes-number").innerHTML = "00";
+                document.getElementById("seconds-number").innerHTML = "00";
+                document.getElementById("status-message").innerHTML = "The target date and time have been reached."; 
+                return;
+            }
+
+            const totalHours = Math.floor(distance / (1000 * 60 * 60));
+            const millisecondsLeftAfterHours = distance % (1000 * 60 * 60);
+            const minutes = Math.floor(millisecondsLeftAfterHours / (1000 * 60));
+            const millisecondsLeftAfterMinutes = distance % (1000 * 60);
+            const seconds = Math.floor(millisecondsLeftAfterMinutes / 1000);
+            
+            const hoursDisplay = totalHours < 10 ? "0" + totalHours : totalHours;
+            const minutesDisplay = minutes < 10 ? "0" + minutes : minutes;
+            const secondsDisplay = seconds < 10 ? "0" + seconds : seconds;
+            
+            document.getElementById("hours-number").innerHTML = hoursDisplay;
+            document.getElementById("minutes-number").innerHTML = minutesDisplay;
+            document.getElementById("seconds-number").innerHTML = secondsDisplay;
+            
+            // SINCRONIZZAZIONE: Riavvia l'animazione ad ogni cambio di secondo
+            restartHeartAnimation();
+
+        }, 1000); // Check every second
+    }
+
+    window.onload = startCountdown; 
+    </script>
+
+</body>
+</html>

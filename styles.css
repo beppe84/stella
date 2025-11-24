@@ -1,0 +1,127 @@
+body {
+    background-color: #000000; 
+    color: white;
+    font-family: 'Arial', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden; 
+}
+
+.full-screen-content {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    position: relative; 
+}
+
+h1 {
+    font-size: 2.5em;
+    color: #cccccc; 
+    margin-bottom: 60px; 
+}
+
+#status-message {
+    font-size: 1.1em;
+    color: #999999;
+    height: 20px;
+    margin-bottom: 20px;
+}
+
+.digital-countdown {
+    display: flex;
+    justify-content: center;
+    /* Allineiamo gli elementi al centro (verticale) per i cuori */
+    align-items: center; 
+    /* Rimosso il gap; lo spazio è gestito dai margini del cuore */
+    gap: 0; 
+    width: auto;
+}
+
+.time-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.number {
+    font-size: 12vw; 
+    font-weight: 300; 
+    color: #eeeeee; 
+    line-height: 0.9; 
+    margin-bottom: 10px; 
+    padding: 0 10px; 
+}
+
+.label {
+    font-size: 2vw; 
+    font-weight: 400; 
+    color: #cccccc; 
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+/* ------------------------------------------- */
+/* STILI PER I SEPARATORI A CUORE (NUOVI) */
+/* ------------------------------------------- */
+
+.heart-separator {
+    display: flex; 
+    align-items: center;
+    justify-content: center;
+    
+    /* Regola lo spazio tra i numeri */
+    width: 6vw; 
+    
+    /* Lo centreremo verticalmente nel flexbox */
+    height: 100%; 
+}
+
+.heart-svg {
+    /* Nuove dimensioni per il cuore (più piccolo per agire da separatore) */
+    width: 15vw; 
+    height: 15vw;
+    max-width: 150px; 
+    max-height: 150px;
+}
+
+/* Keyframes e Animazione (Ciclo di 1s, Colore Rosso) */
+@keyframes fade-heart {
+    /* 0.0s: Inizia invisibile e piccolo */
+    0% { opacity: 0; transform: translateY(-20px) scale(0.8); } 
+    /* 0.05s: Appare istantaneamente, ingrandendosi */
+    1% { opacity: 1; transform: translateY(-20px) scale(1.3); } 
+    /* 20%: Scompare rapidamente */
+    5% { opacity: 1; transform: translateY(-20px) scale(0.9); } 
+    /* 100%: Rimane invisibile */
+    100% { opacity: 0; transform: translateY(-20px) scale(0.8); } 
+}
+
+.heart-animated {
+    /* Applicato al contenitore del cuore */
+    animation: fade-heart 1s ease-out forwards;
+}
+
+
+/* Stili per schermi più piccoli */
+@media (max-width: 768px) {
+    .digital-countdown {
+        gap: 0;
+    }
+    .number {
+        font-size: 20vw; 
+    }
+    .label {
+        font-size: 3vw; 
+    }
+    .heart-svg {
+        width: 6vw;
+        height: 6vw;
+    }
+}
