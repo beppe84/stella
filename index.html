@@ -4,15 +4,29 @@
     <meta charset="UTF-8">
     <title>Meeting in Malmö bin</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap" rel="stylesheet">
 </head>
 <body>
 
-    <div class="full-screen-content"> 
+    <div id="countdown-content" class="full-screen-content"> 
         <h1>Meeting in Malmö in</h1>
         
         <p id="status-message"></p>
         
         <div class="digital-countdown">
+            
+            <div class="time-group">
+                <span id="days-number" class="number">00</span>
+                <span class="label">Days</span>
+            </div>
+            
+            <div id="heart-3" class="heart-separator">
+                <svg viewBox="0 0 100 100" class="heart-svg">
+                    <path d="M50,90 C-10,40 10,0 50,20 C90,0 110,40 50,90 Z" fill="#ff69b4"/> 
+                </svg>
+            </div>
             
             <div class="time-group">
                 <span id="hours-number" class="number">00</span>
@@ -45,31 +59,42 @@
         
     </div>
 
-    <div id="heart-rain-container">
-        <div id="final-screen" class="final-heart-container">
-            <span class="final-text-message">
-                Welcome<br>into my mess<br>Stella!
-            </span>
+    <div id="neon-final-screen" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; align-items: center; justify-content: center; background-color: #000;">
+        
+         <div id="heart-rain-container"></div> 
+        <div id="container-neon">
+            <div id="txt-blur">Journeys end<br>in lovers meeting</div>
+            <div id="txt">Journeys end<br>in lovers meeting</div>
+            <span id="gradient"></span>
+            <span id="light"></span>
         </div>
     </div>
 
+
     <script>
     let countdownInterval;
-    const TARGET_DATE_STRING = "2025-11-28 09:30:00"; // La tua data target
+    // TARGET_DATE_STRING è mantenuta
+    const TARGET_DATE_STRING = "2025-11-28 09:30:00"; 
     const countDownDateMs = new Date(TARGET_DATE_STRING).getTime(); 
     
     const heart1 = document.getElementById("heart-1");
     const heart2 = document.getElementById("heart-2");
+    const heart3 = document.getElementById("heart-3"); 
     
-    const fullScreenContent = document.querySelector(".full-screen-content"); 
-    const finalScreen = document.getElementById("final-screen"); 
-    const heartRainContainer = document.getElementById("heart-rain-container");
+    // Rinomino fullScreenContent in countdownContent per chiarezza
+    const countdownContent = document.getElementById("countdown-content");
+    const neonFinalScreen = document.getElementById("neon-final-screen");
+    const heartRainContainer = document.getElementById("heart-rain-container"); // NUOVA VARIABILE
+    
+    // Variabile per tracciare lo stato
+    let countdownFinished = false; 
+    let heartRainInterval; // NUOVA VARIABILE
 
     /**
      * Riavvia l'animazione forzando il ricalcolo CSS, sincronizzando il battito.
      */
     function restartHeartAnimation() {
-        const hearts = [heart1, heart2];
+        const hearts = [heart1, heart2, heart3]; 
         hearts.forEach(heart => {
             heart.classList.remove("heart-animated");
             void heart.offsetWidth; 
@@ -77,59 +102,85 @@
         });
     }
 
-    // --- FUNZIONI PER LA PIOGGIA DI CUORI ---
-    const colors = ['#87CEEB', '#FF69B4']; // Azzurro (SkyBlue) e Rosa (HotPink)
-    const numHearts = 50; 
-
+    /**
+     * NUOVA FUNZIONE: Genera un singolo cuore, lo anima e lo rimuove.
+     */
     function createHeart() {
         const heart = document.createElement('div');
         heart.classList.add('rain-heart');
-        const color = colors[Math.floor(Math.random() * colors.length)];
-        heart.style.backgroundColor = color;
         
-        const size = Math.random() * (60 - 30) + 30; // da 30px a 60px
-        heart.style.width = `${size}px`;
-        heart.style.height = `${size}px`;
-        
-        heart.style.transform = `rotate(${Math.random() * 360}deg)`;
+        // imposta opacità casuale
+        const opacity = Math.random() * 0.4 + 1;
 
-        heart.style.left = `${Math.random() * 100}vw`;
-        heart.style.top = `${-size}px`; 
+        // Colore casuale tra rosa (#ff69b4) e azzurro (#61dafb)
+        const colors = ["#ff69b4", "#61dafb"];
+        const color = colors[Math.floor(Math.random() * colors.length)];
         
-        const duration = Math.random() * (10 - 5) + 5; // da 5s a 10s
+        // Dimensione casuale
+        const size = Math.random() * 60 + 30; // tra 15px e 25px
+        
+        // Posizionamento orizzontale casuale
+        const startPosition = Math.random() * 100; // tra 0% e 100%
+        
+        // Animazione e durata casuale per un effetto più naturale
+        const duration = Math.random() * 3 + 4; // tra 4s e 7s
+        const delay = Math.random() * 1.5; // fino a 2s di ritardo
+
+        // Stile del cuore SVG
+        heart.innerHTML = `
+            <svg viewBox="0 0 100 100" style="fill: ${color}; width: ${size}px; height: ${size}px;">
+                <path d="M50,90 C-10,40 10,0 50,20 C90,0 110,40 50,90 Z"/> 
+            </svg>
+        `;
+        
+        heart.style.left = `${startPosition}vw`;
+        heart.style.opacity = opacity;
         heart.style.animationDuration = `${duration}s`;
-        heart.style.animationDelay = `${Math.random() * duration}s`; 
+        heart.style.animationDelay = `${delay}s`;
         
         heartRainContainer.appendChild(heart);
-    }
 
+        // Rimuove il cuore dopo che l'animazione è finita
+        heart.addEventListener('animationend', () => {
+            heart.remove();
+        });
+    }
+    
+    /**
+     * NUOVA FUNZIONE: Inizia la generazione continua della pioggia di cuori.
+     */
     function startHeartRain() {
-        // Nasconde il countdown
-        fullScreenContent.style.display = 'none';
+        if (heartRainInterval) clearInterval(heartRainInterval);
         
-        // Mostra il contenitore della pioggia di cuori
-        heartRainContainer.style.display = 'block'; 
-        
-        // Assicurati che il contenitore del TESTO FINALE sia visibile
-        finalScreen.style.display = 'flex'; 
-
-        for (let i = 0; i < numHearts; i++) {
-            createHeart();
-        }
+        // Genera un cuore ogni 200ms
+        heartRainInterval = setInterval(createHeart, 100); 
     }
-    // --- FINE FUNZIONI PER LA PIOGGIA DI CUORI ---
+    
+    /**
+     * NUOVA FUNZIONE: Ferma la generazione della pioggia di cuori.
+     */
+    function stopHeartRain() {
+        if (heartRainInterval) clearInterval(heartRainInterval);
+    }
 
+
+    function showNeonAnimation() {
+        countdownContent.style.display = 'none'; // Nasconde il countdown
+        neonFinalScreen.style.display = 'grid'; // Mostra l'animazione neon (display: grid per centratura)
+        startHeartRain(); // Avvia la pioggia di cuori
+    }
 
     function startCountdown() {
         if (countdownInterval) {
             clearInterval(countdownInterval);
         }
         
-        fullScreenContent.style.display = 'flex';
-        finalScreen.style.display = 'none'; // Il testo finale è nascosto
-        heartRainContainer.style.display = 'none'; 
+        countdownContent.style.display = 'flex';
+        neonFinalScreen.style.display = 'none'; 
         
-        document.getElementById("status-message").innerHTML = "";
+        stopHeartRain(); // Assicura che la pioggia sia ferma
+        
+        document.getElementById("status-message").innerHTML = ""; 
 
         restartHeartAnimation(); 
 
@@ -138,25 +189,32 @@
             const now = new Date().getTime();
             let distance = countDownDateMs - now;
 
-            if (distance < 0) {
-                clearInterval(countdownInterval);
-                
-                // GESTIONE FINE COUNTDOWN: Avvia la pioggia di cuori
-                startHeartRain(); 
-                
-                return;
-            }
-
-            const totalHours = Math.floor(distance / (1000 * 60 * 60));
+            if (distance <= 0) {
+                // Se il countdown è finito e non abbiamo ancora mostrato l'animazione
+                if (!countdownFinished) {
+                    clearInterval(countdownInterval); // Ferma il timer
+                    showNeonAnimation(); // Mostra l'animazione finale
+                    countdownFinished = true;
+                    return; 
+                }
+                distance = 0; 
+            } 
+            
+            // Logica di calcolo del tempo
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const millisecondsLeftAfterDays = distance % (1000 * 60 * 60 * 24);
+            const totalHours = Math.floor(millisecondsLeftAfterDays / (1000 * 60 * 60));
             const millisecondsLeftAfterHours = distance % (1000 * 60 * 60);
             const minutes = Math.floor(millisecondsLeftAfterHours / (1000 * 60));
             const millisecondsLeftAfterMinutes = distance % (1000 * 60);
             const seconds = Math.floor(millisecondsLeftAfterMinutes / 1000);
             
+            const daysDisplay = days < 10 ? "0" + days : days;
             const hoursDisplay = totalHours < 10 ? "0" + totalHours : totalHours;
             const minutesDisplay = minutes < 10 ? "0" + minutes : minutes;
             const secondsDisplay = seconds < 10 ? "0" + seconds : seconds;
             
+            document.getElementById("days-number").innerHTML = daysDisplay;
             document.getElementById("hours-number").innerHTML = hoursDisplay;
             document.getElementById("minutes-number").innerHTML = minutesDisplay;
             document.getElementById("seconds-number").innerHTML = secondsDisplay;
